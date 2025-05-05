@@ -1,0 +1,9 @@
+cli_app:
+  model_name: diecast
+  model_alias: production
+  tracking_uri: http://localhost:5001
+  src_dir: data/src
+  dst_dir: data/dst
+  threshold: 0.5
+  target_production: 100
+  target_defect_rate: 0.01

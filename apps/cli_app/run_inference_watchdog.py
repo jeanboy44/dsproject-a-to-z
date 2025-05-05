@@ -1,4 +1,5 @@
 import logging
+import shutil
 import time
 from pathlib import Path
 from typing import Optional
@@ -59,7 +60,7 @@ def run(
     src_path: Path,
     dst_path: Path,
 ):
-    logger.info(f"Running inference on '{src_path}' and saving to '{dst_path}'")
+    logger.info(f"Running inference on '{src_path}'")
     try:
         input_data = pd.read_csv(src_path)
     except Exception as e:
@@ -128,7 +129,21 @@ def main(
         "--dst-dir",
         help="The path to the destination directory.",
     ),
+    reset: bool = Option(
+        False,
+        "--reset",
+        help="Reset the source and destination directories.",
+    ),
 ):
+    if reset:
+        if src_dir.is_dir():
+            shutil.rmtree(src_dir)
+        src_dir.mkdir(parents=True, exist_ok=True)
+
+        if dst_dir.is_dir():
+            shutil.rmtree(dst_dir)
+        dst_dir.mkdir(parents=True, exist_ok=True)
+
     model_handler = ModelEventHandler(
         model_name, model_alias, tracking_uri, src_dir, dst_dir
     )

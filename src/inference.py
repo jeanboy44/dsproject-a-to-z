@@ -30,40 +30,35 @@ def validate_data_schema(
     Returns:
         True if the input data schema matches the model signature, False otherwise.
     """
-    try:
-        mlflow.set_tracking_uri(tracking_uri)
-        model_uri = f"models:/{model_name}@{model_alias}"
-        ic(model_uri)
-        model_info = mlflow.models.get_model_info(model_uri)
+    mlflow.set_tracking_uri(tracking_uri)
+    model_uri = f"models:/{model_name}@{model_alias}"
+    ic(model_uri)
+    model_info = mlflow.models.get_model_info(model_uri)
 
-        if not model_info.signature or not model_info.signature.inputs:
-            ic(f"Warning: Model signature or input schema not found for {model_uri}.")
-            return False
-        expected_columns = model_info.signature.inputs.input_names()
-        actual_columns = input_data.columns.tolist()
+    if not model_info.signature or not model_info.signature.inputs:
+        ic(f"Warning: Model signature or input schema not found for {model_uri}.")
+        return False
+    expected_columns = model_info.signature.inputs.input_names()
+    actual_columns = input_data.columns.tolist()
 
-        ic(expected_columns)
-        ic(actual_columns)
+    ic(expected_columns)
+    ic(actual_columns)
 
-        # Simple check: Does the input data contain all expected columns?
-        # More robust checks could compare types or enforce column order if necessary.
-        missing_columns = set(expected_columns) - set(actual_columns)
-        extra_columns = set(actual_columns) - set(expected_columns)
+    # Simple check: Does the input data contain all expected columns?
+    # More robust checks could compare types or enforce column order if necessary.
+    missing_columns = set(expected_columns) - set(actual_columns)
+    extra_columns = set(actual_columns) - set(expected_columns)
 
-        if not missing_columns and not extra_columns:
-            ic("Data schema validation successful.")
-            return True
-        else:
-            if missing_columns:
-                ic("Validation Failed: Missing columns in input data:")
-                ic(missing_columns)
-            if extra_columns:
-                ic("Validation Failed: Extra columns found in input data:")
-                ic(extra_columns)
-            return False
-
-    except Exception as e:
-        print(f"Error during data schema validation: {e}")
+    if not missing_columns and not extra_columns:
+        ic("Data schema validation successful.")
+        return True
+    else:
+        if missing_columns:
+            ic("Validation Failed: Missing columns in input data:")
+            ic(missing_columns)
+        if extra_columns:
+            ic("Validation Failed: Extra columns found in input data:")
+            ic(extra_columns)
         return False
 
 
@@ -88,17 +83,13 @@ def run_inference(input_data: pd.DataFrame, model: Booster) -> pd.DataFrame:
     Returns:
         A pandas DataFrame containing the predictions.
     """
-    try:
-        predictions = model.predict(input_data)
-        # Ensure predictions are returned as a DataFrame
-        if not isinstance(predictions, pd.DataFrame):
-            predictions = pd.DataFrame(
-                predictions, columns=["y_hat"]
-            )  # Adjust column name if needed
-        return predictions
-    except Exception as e:
-        print(f"Error during inference: {e}")
-        return pd.DataFrame()  # Return empty DataFrame on error
+    predictions = model.predict(input_data)
+    # Ensure predictions are returned as a DataFrame
+    if not isinstance(predictions, pd.DataFrame):
+        predictions = pd.DataFrame(
+            predictions, columns=["y_hat"]
+        )  # Adjust column name if needed
+    return predictions
 
 
 def save_predictions(predictions: pd.DataFrame, output_path: Path = "predictions.csv"):
@@ -109,14 +100,7 @@ def save_predictions(predictions: pd.DataFrame, output_path: Path = "predictions
         predictions: The pandas DataFrame containing predictions.
         output_path: The path to save the CSV file.
     """
-    if predictions.empty:
-        print("No predictions to save.")
-        return
-
-    try:
-        predictions.to_csv(output_path, index=False)
-    except Exception as e:
-        print(f"Error saving predictions: {e}")
+    predictions.to_csv(output_path, index=False)
 
 
 if __name__ == "__main__":
