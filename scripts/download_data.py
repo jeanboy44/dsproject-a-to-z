@@ -1,4 +1,3 @@
-import os
 from pathlib import Path
 
 import gdown
@@ -16,7 +15,6 @@ def main(
     print(f"저장 경로: {output_path}")
 
     try:
-        # Download the file using gdown
         gdown.download(url, str(output_path), quiet=False, fuzzy=True)
         print("다운로드 성공!")
     except Exception as e:
