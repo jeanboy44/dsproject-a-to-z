@@ -1,4 +1,3 @@
-import shutil
 import time
 from datetime import datetime
 from pathlib import Path
@@ -41,7 +40,7 @@ def simulate_production(
         samples = df.iloc[[random_idx], :]
         samples.to_csv(
             dst_dir
-            / f"{idx + 1:04d}_{idx:04d}_{datetime.now().strftime('%Y%m%d%H%M%S')}.csv",
+            / f"{idx + 1:04d}_{random_idx:04d}_{datetime.now().strftime('%Y%m%d%H%M%S')}.csv",
             index=False,
         )
 
@@ -56,7 +55,7 @@ def simulate_cli_production(
         help="The path to the input CSV file.",
     ),
     cycle_time: int = Option(
-        5,
+        1,
         "--cycle-time",
         help="The cycle time for each production. in seconds.",
     ),
@@ -79,8 +78,33 @@ def simulate_cli_production(
 
 
 @app.command("fastapi")
-def simulate_fastapi_production():
-    pass
+def simulate_fastapi_production(
+    src_path: Path = Option(
+        "data/DieCasting_Quality_Raw_Data.csv",
+        "--src-path",
+        help="The path to the input CSV file.",
+    ),
+    cycle_time: int = Option(
+        1,
+        "--cycle-time",
+        help="The cycle time for each production. in seconds.",
+    ),
+    seed: int = Option(
+        42,
+        "--seed",
+        help="The random seed for reproducibility.",
+    ),
+):
+    app_config = config["fastapi_app"]
+    src_dir = Path(app_config["src_dir"])
+
+    simulate_production(
+        src_path=src_path,
+        dst_dir=src_dir,
+        target_production=app_config["target_production"],
+        cycle_time=cycle_time,
+        seed=seed,
+    )
 
 
 if __name__ == "__main__":

@@ -87,7 +87,7 @@ def run_inference(input_data: pd.DataFrame, model: Booster) -> pd.DataFrame:
     # Ensure predictions are returned as a DataFrame
     if not isinstance(predictions, pd.DataFrame):
         predictions = pd.DataFrame(
-            predictions, columns=["y_hat"]
+            predictions, columns=["probability"]
         )  # Adjust column name if needed
     return predictions
 

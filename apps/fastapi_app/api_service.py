@@ -1,5 +1,5 @@
 # To run (example):
-# PYTHONPATH=. uvicorn apps.fastapi_app.api_service:app --reload --port 8000
+# PYTHONPATH=. uvicorn apps.fastapi_app.api_service:app --reload --port 8001
 
 
 import logging
@@ -94,7 +94,7 @@ class InputData(BaseModel):
 class Response(BaseModel):
     """Response body structure."""
 
-    y_hat: float
+    probability: float
 
 
 # --- Globals ---
@@ -142,12 +142,12 @@ async def predict(input_data: InputData):
     # 3. Run inference
     try:
         predictions_raw = run_inference(processed_data, MODEL)
-        y_hat = predictions_raw["y_hat"][0]
+        probability = predictions_raw["probability"][0]
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error during inference: {e}")
 
     # 4. Return predictions
-    return Response(y_hat=y_hat)
+    return Response(probability=probability)
 
 
 @app.get("/", summary="Health Check")

@@ -120,12 +120,12 @@ def main(
         help="The tracking URI of the model.",
     ),
     src_dir: Path = Option(
-        "data/src",
+        "data/cli_app/src",
         "--src-dir",
         help="The path to the source directory.",
     ),
     dst_dir: Path = Option(
-        "data/dst",
+        "data/cli_app/dst",
         "--dst-dir",
         help="The path to the destination directory.",
     ),

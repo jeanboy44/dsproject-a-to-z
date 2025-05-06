@@ -2,8 +2,23 @@ cli_app:
   model_name: diecast
   model_alias: production
   tracking_uri: http://localhost:5001
-  src_dir: data/src
-  dst_dir: data/dst
+  src_dir: data/cli_app/src
+  dst_dir: data/cli_app/dst
+  results_dir: data/cli_app
+  threshold: 0.5
+  target_production: 100
+  target_defect_rate: 0.01
+
+
+fastapi_app:
+  model_name: diecast
+  model_alias: production
+  tracking_uri: http://localhost:5001
+  host: 127.0.0.1
+  port: 8001
+  src_dir: data/fastapi_app/src
+  dst_dir: data/fastapi_app/dst
+  results_dir: data/fastapi_app
   threshold: 0.5
   target_production: 100
   target_defect_rate: 0.01

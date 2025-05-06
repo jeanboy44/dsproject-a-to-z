@@ -1,11 +1,36 @@
-import threading
-import time
 from pathlib import Path
 
 import pandas as pd
 import streamlit as st
 import yaml
 from streamlit_autorefresh import st_autorefresh
+
+
+def get_results_to_csv(src_dir: Path, dst_dir: Path, threshold: float):
+    features = []
+    for file in src_dir.glob("*.csv"):
+        df = pd.read_csv(file)
+        df["file_name"] = file.stem
+        features.append(df)
+
+    features = pd.concat(features)
+
+    predictions = []
+    for file in dst_dir.glob("*.csv"):
+        df = pd.read_csv(file)
+        df["file_name"] = file.stem
+        predictions.append(df)
+
+    predictions = pd.concat(predictions)
+    predictions["y_hat"] = predictions["probability"] > threshold
+
+    results = pd.merge(features, predictions, on="file_name", how="left")
+    return results
+
+
+src_dir = Path("data/cli_app/src")
+dst_dir = Path("data/cli_app/dst")
+results_dir = Path("data/cli_app/results")
 
 
 def load_config(config_path: str) -> dict:
@@ -29,16 +54,18 @@ def count_defect(dst_dir: Path, threshold: float):
     num_defect = 0
     for file in dst_dir.glob("*.csv"):
         df = pd.read_csv(file)
-        if df["y_hat"].iloc[0] > threshold:
+        if df["probability"].iloc[0] > threshold:
             num_defect += 1
     return num_defect
 
 
 config = load_config("apps/streamlit_app/config.yaml")
+src_dir = Path(config["src_dir"])
+dst_dir = Path(config["dst_dir"])
 
-st_autorefresh(interval=1000)
-production_amount = count_production(Path("data/dst"))
-defect_amount = count_defect(Path("data/dst"), 0.5)
+st_autorefresh(interval=500)
+production_amount = count_production(dst_dir)
+defect_amount = count_defect(dst_dir, 0.5)
 nondefect_amount = production_amount - defect_amount
 defect_rate = defect_amount / production_amount if production_amount > 0 else 0
 
@@ -64,3 +91,7 @@ st.metric(
     delta_color="inverse",
     delta=f"{(defect_rate - config['target_defect_rate']) * 100}",
 )
+
+if production_amount == config["target_production"]:
+    results = get_results_to_csv(src_dir, dst_dir, config["threshold"])
+    results.to_csv(results_dir / "results.csv", index=False)
