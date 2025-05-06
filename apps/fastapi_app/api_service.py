@@ -3,11 +3,11 @@
 
 
 import logging
-from typing import Any, Dict, List
+from typing import Any
 
 import pandas as pd
 from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 
 from src.inference import load_model, preprocess, run_inference
 
