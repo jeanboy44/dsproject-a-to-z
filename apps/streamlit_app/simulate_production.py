@@ -91,5 +91,35 @@ def simulate_cli_production(
     )
 
 
+@app.command("fastapi")
+def simulate_fastapi_production(
+    src_path: Path = Option(
+        "data/exp01/test.csv",
+        "--src-path",
+        help="The path to the input CSV file.",
+    ),
+    cycle_time: int = Option(
+        1,
+        "--cycle-time",
+        help="The cycle time for each production. in seconds.",
+    ),
+    seed: int = Option(
+        42,
+        "--seed",
+        help="The random seed for reproducibility.",
+    ),
+):
+    app_config = config["fastapi_app"]
+    src_dir = Path(app_config["src_dir"])
+
+    simulate_production(
+        src_path=src_path,
+        dst_dir=src_dir,
+        target_production=app_config["target_production"],
+        cycle_time=cycle_time,
+        seed=seed,
+    )
+
+
 if __name__ == "__main__":
     app()
