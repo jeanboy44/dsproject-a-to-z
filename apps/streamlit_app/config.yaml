@@ -1,0 +1,7 @@
+cli_app:
+  src_dir: data/cli_app/src
+  dst_dir: data/cli_app/dst
+  results_dir: data/cli_app
+  threshold: 0.3
+  target_production: 100
+  target_defect_rate: 0.01

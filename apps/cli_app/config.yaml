@@ -1,0 +1,6 @@
+model_name: diecasting_base
+model_alias: production
+tracking_uri: http://localhost:5001
+src_dir: data/cli_app/src
+dst_dir: data/cli_app/dst
+reset: true
