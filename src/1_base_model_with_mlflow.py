@@ -21,7 +21,7 @@ if __name__ == "__main__":
         )
 
         # 3. LightGBM 데이터셋 생성
-        print("LightGBM 데이터셋 생성...")
+        print("데이터셋 생성")
         lgb_train = lgb.Dataset(X_train, y_train)
         lgb_eval = lgb.Dataset(X_test, y_test, reference=lgb_train)
 
@@ -33,40 +33,43 @@ if __name__ == "__main__":
             "num_leaves": 31,
             "learning_rate": 0.05,
             "feature_fraction": 0.9,
-            "verbose": -1,  # Suppress LightGBM's default verbosity
+            "verbose": -1,
         }
 
         # 5. 모델 학습
-        print("Training LightGBM model...")
+        print("모델 학습")
         gbm = lgb.train(
             params,
             lgb_train,
             num_boost_round=100,
             valid_sets=[lgb_train, lgb_eval],
         )
-        print("Model training completed.")
 
         # 6. 예측
-        print("예측 진행...")
+        print("예측")
         y_pred_proba = gbm.predict(X_test, num_iteration=gbm.best_iteration)
         y_pred = np.round(y_pred_proba)
 
         accuracy = accuracy_score(y_test, y_pred)
         print(f"테스트셋 정확도: {accuracy:.4f}")
 
-        # 7. 태그 설정
+        # 7. mlflow에 저장
+        # 파라미터
+        mlflow.log_params(params)
+
+        # 태그
         mlflow.set_tag("model", "LightGBM")
         mlflow.set_tag("model_version", "1.0.0")
         mlflow.set_tag("model_description", "LightGBM model for iris dataset")
 
-        # 8. 로그 메트릭
+        # 메트릭
         mlflow.log_metrics({"accuracy": accuracy})
 
-        # 9. 로그 샘플 데이터
+        # 데이터 샘플
         iris.data.head(10).to_csv("data_sample.csv", index=False)
         mlflow.log_artifact(local_path="data_sample.csv")
 
-        # 10. 로그 모델 (with signature)
+        # 모델
         mlflow.lightgbm.log_model(
             gbm,
             artifact_path="model",

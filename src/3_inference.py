@@ -18,8 +18,8 @@ if __name__ == "__main__":
     )
     run_id = model_version_details.run_id
     # run에 등록된 예제 데이터 가져오기
-    client.download_artifacts(run_id, "model/input_example.json", ".")
-    with open("model/input_example.json", "r") as f:
+    client.download_artifacts(run_id, "model/input_example.json", "data/")
+    with open("data/model/input_example.json", "r") as f:
         input_example = json.load(f)
         input_example = pd.DataFrame(
             data=input_example["data"], columns=input_example["columns"]
