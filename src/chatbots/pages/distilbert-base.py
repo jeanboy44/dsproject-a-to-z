@@ -2,16 +2,19 @@ import streamlit as st
 import torch
 from transformers import AutoModelForQuestionAnswering, AutoTokenizer
 
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
 
 def chatbot(text: str, context: str) -> str:
     inputs = tokenizer(text, context, return_tensors="pt")
+    inputs_on_device = {k: v.to(device) for k, v in inputs.items()}
 
     with torch.no_grad():
-        outputs = model(**inputs)
+        outputs = model(**inputs_on_device)
 
     start = torch.argmax(outputs.start_logits)
     end = torch.argmax(outputs.end_logits) + 1
-    answer_span = inputs["input_ids"][0][start:end]
+    answer_span = inputs_on_device["input_ids"][0][start:end]
     answer = tokenizer.convert_tokens_to_string(
         tokenizer.convert_ids_to_tokens(answer_span)
     )
@@ -20,7 +23,10 @@ def chatbot(text: str, context: str) -> str:
 
 model_name = "distilbert-base-uncased-distilled-squad"
 tokenizer = AutoTokenizer.from_pretrained(model_name)
-model = AutoModelForQuestionAnswering.from_pretrained(model_name)
+model = AutoModelForQuestionAnswering.from_pretrained(
+    model_name, low_cpu_mem_usage=False
+)
+model.to(device)
 
 if "messages_bert" not in st.session_state:
     st.session_state.messages_bert = []
