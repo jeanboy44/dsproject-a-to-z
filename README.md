@@ -39,14 +39,36 @@ pytest tests
 ```
 
 ## 실습 순서
-1. pytest 실행
+1. 다운로드 데이터
 ```
-pytest -s -vv
-```
-
-2. sample.py 코드 실행
-```
-python src/sample.py
+python scripts/download_data.py --url https://drive.google.com/file/d/1Bh_Q1WROysdeF25BazhCkddKs-8bjJCi/view?usp=sharing --output-path data/DieCasting_Quality_Raw_Data.csv
 ```
 
-3. notebooks/sample.ipynb 실행
+2. EDA
+`notebooks/01_eda.ipynb` 실행
+
+3. 데이터 전처리
+```
+python scripts/preprocess_data.py --input-path data/DieCasting_Quality_Raw_Data.csv --output-path data/DieCasting_Quality_Data_processed.csv
+```
+
+4. MLFLOW 셋업
+```
+mlflow server --backend-store-uri ./mlruns --default-artifact-root ./mlruns --host 0.0.0.0 --port 5001
+```
+
+5. 실험 1. MLFlow 실험 생성
+```
+python notebooks/create_mlflow_experiment.py --experiment-name exp01
+```
+
+6. 실험 1. 학습, 테스트 데이터 생성
+```
+python notebooks/exp01/create_train_test.py
+```
+
+7. 실험 1. 모델 분석 실행
+    - `notebooks/exp01/01_base.ipynb`
+    - `notebooks/exp01/02_base_mlflow.ipynb`
+    - `notebooks/exp01/03_base_mlflow_autolog.ipynb`
+    - `notebooks/exp01/04_add_your_code.ipynb`
