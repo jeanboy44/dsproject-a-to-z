@@ -1,0 +1,12 @@
+def test_import_packages():
+    import gdown
+    import lightgbm
+    import mlflow
+    import pandas
+    import pytest
+    import sklearn
+    import streamlit
+    import streamlit_autorefresh
+    import typer
+    import plotly
+    import watchdog
